@@ -33,13 +33,20 @@ import {Request, Response} from "express";
   //! END @TODO1
 
   app.get("/filteredimage", async (req: Request, res: Response) => {
-    const image_url: string = req.query.image_url;
-    let filteredPath: string;
-    if(image_url){
-      filteredPath = await filterImageFromURL(image_url);
+    try {
+      const image_url: string = req.query.image_url;
+      let filteredPath: string;
+      if (image_url) {
+        filteredPath = await filterImageFromURL(image_url);
+      }
+      res.status(200).sendFile(filteredPath);
+      setTimeout(async () => await deleteLocalFiles([filteredPath]), 1000);
+    }catch (e) {
+      res.status(400).send({
+        status: 'error',
+        message: 'An error occurred processing your request'
+      })
     }
-    res.sendFile(filteredPath);
-    setTimeout(async () => await deleteLocalFiles([filteredPath]), 1000);
   })
 
 
